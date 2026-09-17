@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Business Setup Application</title>
+<style>
+:root{
+  --navy:#0F2C4C;
+  --navy-dark:#0A1F38;
+  --gold:#C9972B;
+  --gold-light:#F3E4C4;
+  --bg:#F7F6F2;
+  --card:#FFFFFF;
+  --text:#1C2733;
+  --text-muted:#6B7686;
+  --border:#E3E1DA;
+  --success:#1E8E5A;
+  --success-bg:#E9F6EF;
+  --radius:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#12181F; --card:#1B232D; --text:#EDEFF2; --text-muted:#9AA5B1; --border:#2B3440; --gold-light:#3A3021;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#12181F; --card:#1B232D; --text:#EDEFF2; --text-muted:#9AA5B1; --border:#2B3440; --gold-light:#3A3021;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  min-height:100vh; padding:0 0 60px;
+}
+.topbar{
+  background:var(--navy); color:#fff; padding:20px 24px;
+  display:flex; align-items:center; justify-content:space-between;
+}
+.topbar .brand{font-weight:700; font-size:18px; letter-spacing:0.3px;}
+.topbar .brand span{color:var(--gold);}
+.wrap{max-width:720px; margin:0 auto; padding:28px 16px;}
+.stepper{display:flex; justify-content:space-between; margin-bottom:28px; overflow-x:auto; gap:4px;}
+.step{flex:1; text-align:center; min-width:64px;}
+.step .dot{
+  width:30px; height:30px; border-radius:50%; margin:0 auto 6px;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--card); border:2px solid var(--border); color:var(--text-muted); font-size:13px; font-weight:600;
+}
+.step.active .dot{border-color:var(--gold); background:var(--gold); color:#fff;}
+.step.done .dot{border-color:var(--navy); background:var(--navy); color:#fff;}
+.step .label{font-size:11px; color:var(--text-muted); line-height:1.3;}
+.step.active .label{color:var(--text); font-weight:600;}
+.card{
+  background:var(--card); border:1px solid var(--border); border-radius:var(--radius);
+  padding:28px; box-shadow:0 1px 3px rgba(0,0,0,0.04);
+}
+h2{margin:0 0 4px; font-size:20px;}
+.sub{color:var(--text-muted); font-size:13px; margin-bottom:22px;}
+.field{margin-bottom:18px;}
+label{display:block; font-size:13px; font-weight:600; margin-bottom:6px;}
+select, input[type=text], input[type=email], input[type=tel]{
+  width:100%; padding:11px 12px; border:1px solid var(--border); border-radius:8px;
+  background:var(--card); color:var(--text); font-size:14px;
+}
+select:focus, input:focus{outline:2px solid var(--gold); outline-offset:1px;}
+.hint{font-size:12px; color:var(--text-muted); margin-top:4px;}
+.badge-erp{
+  display:inline-flex; align-items:center; gap:5px; font-size:11px; color:var(--navy);
+  background:var(--gold-light); padding:2px 8px; border-radius:20px; margin-left:8px; font-weight:600;
+}
+.nameRow{display:flex; gap:8px;}
+.nameRow input{flex:1;}
+.check-btn{
+  flex:none; background:var(--navy); color:#fff; border:none; padding:0 16px;
+  border-radius:8px; font-size:13px; font-weight:600; cursor:pointer; white-space:nowrap;
+}
+.check-btn:hover{background:var(--navy-dark);}
+.check-btn:disabled{opacity:0.6; cursor:default;}
+.avail{font-size:12px; margin-top:8px; display:none; align-items:center; gap:6px;}
+.avail.ok{color:var(--success); display:flex;}
+.avail.taken{color:#B3261E; display:flex;}
+.avail.checking{color:var(--text-muted); display:flex;}
+.row2{display:flex; gap:14px;}
+.row2 .field{flex:1;}
+.shareholder{
+  border:1px dashed var(--border); border-radius:10px; padding:14px; margin-bottom:12px; position:relative;
+}
+.shareholder .rm{position:absolute; top:10px; right:10px; background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:13px;}
+.add-btn{
+  width:100%; padding:11px; border:1px dashed var(--navy); background:transparent; color:var(--navy);
+  border-radius:8px; font-size:13px; font-weight:600; cursor:pointer;
+}
+.actions{display:flex; justify-content:space-between; margin-top:26px;}
+button.primary{
+  background:var(--navy); color:#fff; border:none; padding:12px 26px; border-radius:8px;
+  font-size:14px; font-weight:600; cursor:pointer;
+}
+button.primary:hover{background:var(--navy-dark);}
+button.ghost{
+  background:transparent; border:1px solid var(--border); color:var(--text); padding:12px 22px;
+  border-radius:8px; font-size:14px; cursor:pointer;
+}
+.summary-row{display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); font-size:14px;}
+.summary-row:last-child{border-bottom:none;}
+.summary-row .k{color:var(--text-muted);}
+.quote-box{
+  background:var(--gold-light); border-radius:10px; padding:18px; text-align:center; margin:18px 0;
+}
+.quote-box .amt{font-size:28px; font-weight:700; color:var(--navy);}
+.quote-box .lbl{font-size:12px; color:var(--text-muted); margin-top:2px;}
+.status-track{margin-top:8px;}
+.status-item{display:flex; gap:12px; padding:10px 0;}
+.status-item .mark{
+  width:22px; height:22px; border-radius:50%; background:var(--border); flex:none; margin-top:2px;
+  display:flex; align-items:center; justify-content:center; font-size:12px; color:#fff;
+}
+.status-item.done .mark{background:var(--success);}
+.status-item.active .mark{background:var(--gold);}
+.status-item .info b{font-size:14px;}
+.status-item .info div{font-size:12px; color:var(--text-muted);}
+.center{text-align:center;}
+.hidden{display:none !important;}
+.small-note{font-size:12px; color:var(--text-muted); text-align:center; margin-top:16px;}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand">Quick<span>Plus</span> Business Setup</div>
+  <div style="font-size:12px;opacity:0.85;">Ras Al Khaimah Free Zone</div>
+</div>
+
+<div class="wrap">
+
+  <div class="stepper" id="stepper"></div>
+
+  <div class="card">
+
+    <!-- STEP 1 -->
+    <div class="stepPanel" data-step="1">
+      <h2>Select emirate / jurisdiction <span class="badge-erp">imported from ERP</span></h2>
+      <div class="sub">Choose where you'd like to register your business.</div>
+      <div class="field">
+        <label for="jurisdiction">Emirate</label>
+        <select id="jurisdiction">
+          <option value="">Loading from ERP…</option>
+        </select>
+      </div>
+      <div class="field" id="freezoneWrap" style="display:none;">
+        <label for="freezone">Free zone</label>
+        <select id="freezone"><option value="rak">Ras Al Khaimah Economic Zone (RAKEZ)</option></select>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="stepPanel hidden" data-step="2">
+      <h2>Company &amp; investor details</h2>
+      <div class="sub">Enter your business name and investor information.</div>
+      <div class="field">
+        <label for="bizname">Proposed business name</label>
+        <div class="nameRow">
+          <input type="text" id="bizname" placeholder="e.g. Nova Trading FZE" oninput="resetAvailability()">
+          <button type="button" class="check-btn" id="checkBtn" onclick="checkAvailability()">Check availability</button>
+        </div>
+        <div class="avail" id="availMsg"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Investor full name</label><input type="text" placeholder="Full legal name"></div>
+        <div class="field"><label>Nationality</label><input type="text" placeholder="Nationality"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>Email</label><input type="email" placeholder="you@email.com"></div>
+        <div class="field"><label>Phone</label><input type="tel" placeholder="+971 5x xxx xxxx"></div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="stepPanel hidden" data-step="3">
+      <h2>Choose business activity <span class="badge-erp">imported from ERP</span></h2>
+      <div class="sub">Select the activities that match your business.</div>
+      <div class="field">
+        <label for="activity">Business activity</label>
+        <select id="activity"><option value="">Loading from ERP…</option></select>
+      </div>
+      <div class="field">
+        <label for="activity2">Additional activity (optional)</label>
+        <select id="activity2"><option value="">None</option></select>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="stepPanel hidden" data-step="4">
+      <h2>Shareholder details</h2>
+      <div class="sub">Add each shareholder and their ownership share.</div>
+      <div id="shareholderList"></div>
+      <button class="add-btn" onclick="addShareholder()">+ Add shareholder</button>
+    </div>
+
+    <!-- STEP 5 -->
+    <div class="stepPanel hidden" data-step="5">
+      <h2>Review application</h2>
+      <div class="sub">Confirm your details before we generate your quotation.</div>
+      <div id="reviewSummary"></div>
+    </div>
+
+    <!-- STEP 6: Quotation + Payment -->
+    <div class="stepPanel hidden" data-step="6">
+      <h2 class="center">Quotation generated</h2>
+      <div class="sub center">Your ERP-generated quotation is ready. Complete payment to proceed.</div>
+      <div class="quote-box">
+        <div class="amt">AED 12,999</div>
+        <div class="lbl">Includes license, 2 visa allocations, registered address · Quotation #RAK-20344</div>
+      </div>
+      <div class="small-note">Quotation expires in 6 days 22 hours — an expiry task has been scheduled in the ERP.</div>
+    </div>
+
+    <!-- STEP 7: Tracking -->
+    <div class="stepPanel hidden" data-step="7">
+      <h2 class="center">Track application</h2>
+      <div class="sub center">Application #RAK-20344</div>
+      <div class="status-track" id="statusTrack"></div>
+    </div>
+
+    <div class="actions">
+      <button class="ghost" id="backBtn" onclick="go(-1)">Back</button>
+      <button class="primary" id="nextBtn" onclick="handleNext()">Next</button>
+    </div>
+  </div>
+  <div class="small-note" id="footNote">Dropdowns marked "imported from ERP" are populated live via a WordPress REST endpoint that proxies your ERP's API.</div>
+</div>
+
+<script>
+const steps = [
+  {n:1,label:'Jurisdiction'},
+  {n:2,label:'Company'},
+  {n:3,label:'Activity'},
+  {n:4,label:'Shareholders'},
+  {n:5,label:'Review'},
+  {n:6,label:'Payment'},
+  {n:7,label:'Track'}
+];
+let current = 1;
+let shareholderCount = 0;
+
+function renderStepper(){
+  const el = document.getElementById('stepper');
+  el.innerHTML = steps.map(s => {
+    let cls = 'step';
+    if(s.n === current) cls += ' active';
+    else if(s.n < current) cls += ' done';
+    return `<div class="${cls}"><div class="dot">${s.n < current ? '✓' : s.n}</div><div class="label">${s.label}</div></div>`;
+  }).join('');
+}
+
+function showStep(n){
+  document.querySelectorAll('.stepPanel').forEach(p=>{
+    p.classList.toggle('hidden', parseInt(p.dataset.step) !== n);
+  });
+  document.getElementById('backBtn').style.visibility = n === 1 ? 'hidden' : 'visible';
+  const nextBtn = document.getElementById('nextBtn');
+  if(n === 5){ nextBtn.textContent = 'Generate quotation'; buildReview(); }
+  else if(n === 6){ nextBtn.textContent = 'Pay & continue'; }
+  else if(n === 7){ nextBtn.style.display = 'none'; document.getElementById('backBtn').style.visibility='hidden'; buildTracker(); }
+  else { nextBtn.style.display = 'inline-block'; nextBtn.textContent = 'Next'; }
+  renderStepper();
+}
+
+function handleNext(){
+  if(current === 6){ simulatePayment(); return; }
+  if(current < steps.length) go(1);
+}
+
+function go(dir){
+  const next = current + dir;
+  if(next < 1 || next > steps.length) return;
+  current = next;
+  showStep(current);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function resetAvailability(){
+  const msg = document.getElementById('availMsg');
+  msg.className = 'avail';
+  msg.textContent = '';
+  document.getElementById('bizname').dataset.checkedValue = '';
+}
+
+function checkAvailability(){
+  const input = document.getElementById('bizname');
+  const val = input.value.trim();
+  const msg = document.getElementById('availMsg');
+  const btn = document.getElementById('checkBtn');
+
+  if(val.length < 3){
+    msg.className = 'avail taken';
+    msg.textContent = 'Enter at least 3 characters first';
+    return;
+  }
+
+  msg.className = 'avail checking';
+  msg.textContent = 'Checking with ERP…';
+  btn.disabled = true;
+
+  // In production: fetch('/wp-json/erp-bridge/v1/name-availability?name=' + encodeURIComponent(val))
+  // which proxies your ERP's trade-name check and returns { available: true|false }.
+  setTimeout(() => {
+    const taken = ['quickplus','rakez','emirates'].some(w => val.toLowerCase().includes(w));
+    if(taken){
+      msg.className = 'avail taken';
+      msg.textContent = '✕ Name unavailable — already registered';
+    } else {
+      msg.className = 'avail ok';
+      msg.textContent = '✓ Name is available';
+    }
+    input.dataset.checkedValue = val;
+    btn.disabled = false;
+  }, 700);
+}
+
+function addShareholder(){
+  shareholderCount++;
+  const id = shareholderCount;
+  const div = document.createElement('div');
+  div.className = 'shareholder';
+  div.id = 'sh'+id;
+  div.innerHTML = `
+    <button class="rm" onclick="document.getElementById('sh${id}').remove()">Remove</button>
+    <div class="row2">
+      <div class="field"><label>Full name</label><input type="text" placeholder="Shareholder name"></div>
+      <div class="field"><label>Share %</label><input type="text" placeholder="e.g. 50"></div>
+    </div>`;
+  document.getElementById('shareholderList').appendChild(div);
+}
+
+function buildReview(){
+  const jurisdiction = document.getElementById('jurisdiction');
+  const activity = document.getElementById('activity');
+  const bizname = document.getElementById('bizname').value || '—';
+  const rows = [
+    ['Jurisdiction', jurisdiction.options[jurisdiction.selectedIndex]?.text || '—'],
+    ['Business name', bizname],
+    ['Business activity', activity.options[activity.selectedIndex]?.text || '—'],
+    ['Shareholders', (document.querySelectorAll('.shareholder').length || 1) + ' added']
+  ];
+  document.getElementById('reviewSummary').innerHTML = rows.map(r =>
+    `<div class="summary-row"><span class="k">${r[0]}</span><span>${r[1]}</span></div>`
+  ).join('');
+}
+
+function simulatePayment(){
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = 'Processing…';
+  nextBtn.disabled = true;
+  setTimeout(()=>{
+    nextBtn.disabled = false;
+    go(1);
+  }, 900);
+}
+
+function buildTracker(){
+  const items = [
+    {label:'Quotation generated', done:true, note:'ERP created quotation #RAK-20344'},
+    {label:'Payment received', done:true, note:'Confirmed via payment gateway'},
+    {label:'Task moved to generation', active:true, note:'ERP is now preparing your license'},
+    {label:'Sales team follow-up', note:'A consultant will confirm final documents'},
+    {label:'License issued', note:'Awaiting completion'}
+  ];
+  document.getElementById('statusTrack').innerHTML = items.map(i => {
+    const cls = i.done ? 'done' : (i.active ? 'active' : '');
+    const mark = i.done ? '✓' : '';
+    return `<div class="status-item ${cls}">
+      <div class="mark">${mark}</div>
+      <div class="info"><b>${i.label}</b><div>${i.note}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function loadERPOptions(){
+  // Placeholder: in production this fetches your WordPress bridge endpoint,
+  // e.g. fetch('/wp-json/erp-bridge/v1/jurisdictions') and /activities
+  const jurisdictions = ['Ras Al Khaimah (RAKEZ)','Dubai Mainland','Dubai Free Zone (IFZA)','Ajman Free Zone','Sharjah (SHAMS)'];
+  const activities = ['General Trading','Consultancy Services','E-commerce','IT & Software Services','Marketing & Media','Real Estate Brokerage'];
+  const jSel = document.getElementById('jurisdiction');
+  const aSel = document.getElementById('activity');
+  const a2Sel = document.getElementById('activity2');
+  jSel.innerHTML = '<option value="">Select an emirate…</option>' + jurisdictions.map(j=>`<option>${j}</option>`).join('');
+  aSel.innerHTML = '<option value="">Select an activity…</option>' + activities.map(a=>`<option>${a}</option>`).join('');
+  a2Sel.innerHTML = '<option value="">None</option>' + activities.map(a=>`<option>${a}</option>`).join('');
+}
+
+loadERPOptions();
+addShareholder();
+showStep(1);
+</script>
+</body>
+</html>
